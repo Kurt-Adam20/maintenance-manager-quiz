@@ -88,16 +88,95 @@ label.answer:has(input:checked) { background:#ccfbf1; border-color:var(--primary
   html { scroll-behavior:auto; }
   * { transition:none !important; }
 }
+
+/* ===== APP-FLOW: start -> quiz (één vraag per scherm) -> review (zelfde als Maintenance Manager Quiz) ===== */
+.quiz-progress, .quiz-nav { display:none; }
+
+body.phase-start .quiz-progress,
+body.phase-start .quiz-nav,
+body.phase-start #quiz,
+body.phase-start .controls,
+body.phase-start .result { display:none; }
+
+body.phase-quiz .intro-panel,
+body.phase-quiz .start-btn,
+body.phase-quiz .controls,
+body.phase-quiz .result,
+body.phase-quiz .scene { display:none; }
+body.phase-quiz #quiz article.card { display:none; }
+body.phase-quiz #quiz article.card.active { display:block; animation:slideIn .28s ease; }
+body.phase-quiz .quiz-progress { display:block; }
+body.phase-quiz .quiz-nav { display:flex; }
+
+body.phase-review .intro-panel,
+body.phase-review .start-btn,
+body.phase-review .quiz-progress,
+body.phase-review .quiz-nav { display:none; }
+
+@keyframes slideIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:none;} }
+
+.start-btn { width:100%; margin:4px 0 8px; font-size:1.05rem; padding:15px; min-height:50px; }
+
+/* Sticky voortgangsheader */
+.quiz-progress { position:sticky; top:0; z-index:30; background:rgba(243,246,248,.92); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); padding:12px 2px 14px; margin-bottom:6px; }
+.qp-top { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:9px; }
+.qp-top #qpLabel { font-weight:800; color:var(--dark); font-size:.95rem; }
+.qp-theme { font-size:.72rem; font-weight:700; color:#155e75; background:#ecfeff; border:1px solid #a5f3fc; padding:3px 10px; border-radius:999px; max-width:55%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qp-bar { height:10px; background:#e5e7eb; border-radius:999px; overflow:hidden; }
+.qp-fill { height:100%; width:2%; border-radius:999px; background:linear-gradient(90deg,var(--primary),#14b8a6); transition:width .3s ease; }
+
+/* Sticky navigatiebalk */
+.quiz-nav { position:sticky; bottom:0; z-index:30; align-items:center; justify-content:space-between; gap:12px; margin-top:10px; padding:14px 2px; padding-bottom:max(14px,env(safe-area-inset-bottom)); background:linear-gradient(to top,var(--bg) 65%,rgba(243,246,248,0)); }
+.quiz-nav button { flex:1 1 0; max-width:220px; width:auto; }
+.nav-counter { flex:0 0 auto; font-weight:800; color:var(--muted); font-size:.92rem; }
+#nextBtn.submit { background:var(--green); }
+#nextBtn.submit:hover { background:#166534; }
+button:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Antwoorden als kaarten met A/B/C/D-badge */
+.answers { gap:10px; }
+label.answer { display:flex; align-items:center; gap:11px; padding:14px 16px; }
+label.answer input { position:absolute; opacity:0; width:1px; height:1px; margin:0; pointer-events:none; }
+.opt-badge { flex:0 0 auto; display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#e5e7eb; color:#374151; font-weight:800; font-size:.95rem; transition:background .12s ease,color .12s ease; }
+.opt-text { flex:1 1 auto; }
+label.answer:has(input:checked) .opt-badge { background:var(--primary); color:#fff; }
+label.answer.correct-answer { background:#dcfce7; border-color:var(--green); box-shadow:inset 0 0 0 1px var(--green); }
+label.answer.correct-answer .opt-badge { background:var(--green); color:#fff; }
+label.answer.correct-answer .opt-text::after { content:" ✓"; color:var(--green); font-weight:800; }
+label.answer.wrong-answer { background:#fee2e2; border-color:var(--red); box-shadow:inset 0 0 0 1px var(--red); }
+label.answer.wrong-answer .opt-badge { background:var(--red); color:#fff; }
+label.answer.wrong-answer .opt-text::after { content:" ✗"; color:var(--red); font-weight:800; }
+
+/* Score-ring op resultaatscherm */
+.score-circle { width:132px; height:132px; border-radius:50%; margin:8px auto 16px; display:grid; place-items:center; position:relative; background:conic-gradient(var(--primary) var(--pct,0%), #e5e7eb 0); }
+.score-circle::before { content:""; position:absolute; inset:13px; border-radius:50%; background:var(--card); }
+.score-circle span { position:relative; font-size:1.9rem; font-weight:800; color:var(--dark); }
+
+@media (max-width:480px){
+  .quiz-nav button { max-width:none; padding:13px 10px; }
+  .quiz-nav { gap:8px; }
+  .nav-counter { font-size:.85rem; }
+}
 </style>
 </head>
-<body>
+<body class="phase-start">
 <header><div class="header-inner"><a href="index.html" style="display:inline-block;margin-bottom:14px;color:#fff;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);padding:6px 13px;border-radius:999px;text-decoration:none;font:600 0.85rem system-ui,-apple-system,sans-serif;">← Andere quiz kiezen</a><br><h1>Kemin Teams Interview Simulatie Quiz</h1><p class="subtitle">Oefen jouw 30–45 minuten gesprek met Justyna Konieczny. Kies telkens het best passende antwoord en krijg scores, uitgebreide uitleg en ideale formuleringen.</p></div></header>
 <main>
-<section class="panel"><h2>Doel van deze simulatie</h2><p>Deze quiz simuleert een eerste Teams-gesprek met een Talent Acquisition Specialist. De focus ligt op jouw communicatie, motivatie, match met de Maintenance Manager rol, leiderschap, CMMS, RCA, safety/GMP, downtime, budget en praktische vragen.</p><div class="grid"><div class="mini"><strong>Max score</strong><span id="maxScoreIntro"></span> punten</div><div class="mini"><strong>Gesprekstype</strong>Teams recruiter-screening</div><div class="mini"><strong>Antwoordstijl</strong>Kort, rustig, concreet</div><div class="mini"><strong>Doelindruk</strong>Hands-on, gestructureerd, betrouwbaar</div></div></section>
-<section class="panel cheat"><h2>Jouw mentale hoofdboodschap</h2><p><strong>“I am a hands-on maintenance and reliability leader who can bring structure, improve uptime, develop technicians and work well with production in a safety- and GMP-driven environment.”</strong></p><div class="cheat-grid"><div class="cheat-item"><strong>Niet te lang praten</strong><br>Antwoorden van 60–90 seconden zijn ideaal.</div><div class="cheat-item"><strong>Teams-tip</strong><br>Kijk regelmatig in de camera, spreek 10% trager en gebruik korte pauzes.</div><div class="cheat-item"><strong>Kernwoorden</strong><br>Uptime, CMMS, PM, RCA, safety, GMP, production collaboration.</div><div class="cheat-item"><strong>Afsluiting</strong><br>Herhaal interesse, match en bereidheid voor next step.</div></div></section>
+<section class="panel intro-panel"><h2>Doel van deze simulatie</h2><p>Deze quiz simuleert een eerste Teams-gesprek met een Talent Acquisition Specialist. De focus ligt op jouw communicatie, motivatie, match met de Maintenance Manager rol, leiderschap, CMMS, RCA, safety/GMP, downtime, budget en praktische vragen.</p><div class="grid"><div class="mini"><strong>Max score</strong><span id="maxScoreIntro"></span> punten</div><div class="mini"><strong>Gesprekstype</strong>Teams recruiter-screening</div><div class="mini"><strong>Antwoordstijl</strong>Kort, rustig, concreet</div><div class="mini"><strong>Doelindruk</strong>Hands-on, gestructureerd, betrouwbaar</div></div></section>
+<section class="panel cheat intro-panel"><h2>Jouw mentale hoofdboodschap</h2><p><strong>“I am a hands-on maintenance and reliability leader who can bring structure, improve uptime, develop technicians and work well with production in a safety- and GMP-driven environment.”</strong></p><div class="cheat-grid"><div class="cheat-item"><strong>Niet te lang praten</strong><br>Antwoorden van 60–90 seconden zijn ideaal.</div><div class="cheat-item"><strong>Teams-tip</strong><br>Kijk regelmatig in de camera, spreek 10% trager en gebruik korte pauzes.</div><div class="cheat-item"><strong>Kernwoorden</strong><br>Uptime, CMMS, PM, RCA, safety, GMP, production collaboration.</div><div class="cheat-item"><strong>Afsluiting</strong><br>Herhaal interesse, match en bereidheid voor next step.</div></div></section>
+<button class="start-btn" onclick="startQuiz()">Start de simulatie →</button>
 <section class="panel controls"><div class="controls-row"><div class="pills"><span class="pill" id="answeredCount">Beantwoord: 0</span><span class="pill" id="scoreLive">Score: nog niet berekend</span><span class="pill" id="avgLive">Gemiddelde: -</span></div><div class="pills"><button onclick="calculateScore()">Score berekenen</button><button class="secondary" onclick="showAll()">Toon alle uitleg</button><button class="light" onclick="resetQuiz()">Reset</button></div></div><div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div></section>
-<section class="panel result" id="resultPanel"><h2>Jouw resultaat</h2><p id="scoreText"></p><p class="level" id="levelText"></p><p id="adviceText"></p><h3>Herhaal deze thema’s</h3><ul id="reviewList"></ul></section>
+<section class="panel result" id="resultPanel"><h2>Jouw resultaat</h2><div class="score-circle" id="scoreCircle"><span id="scorePct">0%</span></div><p id="scoreText"></p><p class="level" id="levelText"></p><p id="adviceText"></p><h3>Herhaal deze thema’s</h3><ul id="reviewList"></ul></section>
+<div class="quiz-progress" id="quizProgress">
+<div class="qp-top"><span id="qpLabel">Vraag 1 / 24</span><span id="qpTheme" class="qp-theme"></span></div>
+<div class="qp-bar"><div class="qp-fill" id="qpFill"></div></div>
+</div>
 <div id="quiz"></div>
+<div class="quiz-nav" id="quizNav">
+<button class="light" id="prevBtn" onclick="prevQuestion()">← Vorige</button>
+<span class="nav-counter" id="navCounter">1 / 24</span>
+<button id="nextBtn" onclick="nextQuestion()">Volgende →</button>
+</div>
 </main>
 <footer>Kemin Maintenance Manager — Teams Interview Simulatie voor Tansu</footer>
 <script>
@@ -109,7 +188,7 @@ function renderQuiz(){
  let container=document.getElementById("quiz"), current="", out="";
  questions.forEach((q,i)=>{
   if(q.phase!==current){current=q.phase; out+=`<h2 class="scene">${esc(current)}</h2>`;}
-  out+=`<article class="card" id="card-${i}"><div class="meta"><span class="tag">Vraag ${i+1}</span><span class="tag">${esc(q.theme)}</span></div><div class="teams-box"><div><div class="avatar">JK</div></div><div><div class="speaker">Justyna Konieczny</div><div>${esc(q.interviewer)}</div></div></div><div class="question-title">${esc(q.question)}</div><div class="answers">${q.options.map((opt,j)=>`<label class="answer"><input type="radio" name="q${i}" value="${j}" onchange="updateProgress()"><strong>${String.fromCharCode(65+j)}.</strong> ${esc(opt[0])}</label>`).join("")}</div><div class="feedback" id="feedback-${i}"></div><div class="model" id="model-${i}"><strong>Beste interviewantwoord:</strong><br>${esc(q.model)}<br><br><strong>Hoe gebruiken in Teams:</strong><br>${esc(q.how)}</div><div class="analysis" id="analysis-${i}"></div></article>`;
+  out+=`<article class="card" id="card-${i}"><div class="meta"><span class="tag">Vraag ${i+1}</span><span class="tag">${esc(q.theme)}</span></div><div class="teams-box"><div><div class="avatar">JK</div></div><div><div class="speaker">Justyna Konieczny</div><div>${esc(q.interviewer)}</div></div></div><div class="question-title">${esc(q.question)}</div><div class="answers">${q.options.map((opt,j)=>`<label class="answer"><input type="radio" name="q${i}" value="${j}" onchange="updateProgress()"><span class="opt-badge">${String.fromCharCode(65+j)}</span><span class="opt-text">${esc(opt[0])}</span></label>`).join("")}</div><div class="feedback" id="feedback-${i}"></div><div class="model" id="model-${i}"><strong>Beste interviewantwoord:</strong><br>${esc(q.model)}<br><br><strong>Hoe gebruiken in Teams:</strong><br>${esc(q.how)}</div><div class="analysis" id="analysis-${i}"></div></article>`;
  });
  container.innerHTML=out; updateProgress();
 }
@@ -126,9 +205,12 @@ function calculateScore(){
   let pick=selected(i), fb=document.getElementById(`feedback-${i}`), model=document.getElementById(`model-${i}`), an=document.getElementById(`analysis-${i}`);
   if(pick===null){weak[q.theme]=(weak[q.theme]||0)+1; fb.className="feedback bad show"; fb.innerHTML=`<strong>Niet beantwoord.</strong> 0 punten. Beste keuze: ${String.fromCharCode(65+q.best)}.`;}
   else {let opt=q.options[pick]; score+=opt[1]; if(opt[1]===5){fb.className="feedback good show"; fb.innerHTML=`<strong>Sterk antwoord.</strong> ${opt[1]} / 5 punten. ${esc(opt[2])}`;} else if(opt[1]>=2){weak[q.theme]=(weak[q.theme]||0)+1; fb.className="feedback ok show"; fb.innerHTML=`<strong>Redelijk, maar niet optimaal.</strong> ${opt[1]} / 5 punten. ${esc(opt[2])}`;} else {weak[q.theme]=(weak[q.theme]||0)+1; fb.className="feedback bad show"; fb.innerHTML=`<strong>Zwak antwoord.</strong> ${opt[1]} / 5 punten. ${esc(opt[2])}`;}}
+  let labels=document.querySelectorAll(`#card-${i} label.answer`);
+  labels.forEach((lab,li)=>{lab.classList.remove("correct-answer","wrong-answer"); if(li===q.best)lab.classList.add("correct-answer"); else if(li===pick)lab.classList.add("wrong-answer");});
   model.classList.add("show"); an.innerHTML=buildAnalysis(q); an.classList.add("show");
  });
  let pct=Math.round(score/maxScore*100), avg=(score/questions.length).toFixed(1);
+ let sc=document.getElementById("scoreCircle"); sc.style.setProperty("--pct",pct+"%"); document.getElementById("scorePct").textContent=pct+"%";
  document.getElementById("scoreLive").textContent=`Score: ${score} / ${maxScore} (${pct}%)`; document.getElementById("avgLive").textContent=`Gemiddelde: ${avg} / 5`;
  let rp=document.getElementById("resultPanel"), lt=document.getElementById("levelText");
  document.getElementById("scoreText").textContent=`Je behaalde ${score} van de ${maxScore} punten. Dat is ${pct}%. Gemiddelde per antwoord: ${avg} / 5.`;
@@ -141,7 +223,30 @@ function calculateScore(){
  rp.classList.add("show"); rp.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function showAll(){questions.forEach((q,i)=>{document.getElementById(`model-${i}`).classList.add("show"); let an=document.getElementById(`analysis-${i}`); an.innerHTML=buildAnalysis(q); an.classList.add("show");});}
-function resetQuiz(){document.querySelectorAll("input[type='radio']").forEach(x=>x.checked=false); document.querySelectorAll(".feedback").forEach(x=>{x.className="feedback";x.innerHTML="";}); document.querySelectorAll(".model").forEach(x=>x.classList.remove("show")); document.querySelectorAll(".analysis").forEach(x=>{x.classList.remove("show");x.innerHTML="";}); document.getElementById("resultPanel").classList.remove("show"); document.getElementById("scoreLive").textContent="Score: nog niet berekend"; document.getElementById("avgLive").textContent="Gemiddelde: -"; updateProgress(); window.scrollTo({top:0,behavior:"smooth"});}
+function resetQuiz(){document.querySelectorAll("input[type='radio']").forEach(x=>x.checked=false); document.querySelectorAll(".feedback").forEach(x=>{x.className="feedback";x.innerHTML="";}); document.querySelectorAll(".model").forEach(x=>x.classList.remove("show")); document.querySelectorAll(".analysis").forEach(x=>{x.classList.remove("show");x.innerHTML="";}); document.querySelectorAll("label.answer").forEach(l=>l.classList.remove("correct-answer","wrong-answer")); document.getElementById("resultPanel").classList.remove("show"); document.getElementById("scoreLive").textContent="Score: nog niet berekend"; document.getElementById("avgLive").textContent="Gemiddelde: -"; updateProgress(); setPhase("start"); window.scrollTo({top:0,behavior:"smooth"});}
+
+/* ===== App-flow: één vraag per scherm (start -> quiz -> review) ===== */
+let stepIndex=0;
+function setPhase(p){document.body.className="phase-"+p;}
+function startQuiz(){stepIndex=0; setPhase("quiz"); showQuestion(0); window.scrollTo({top:0,behavior:"smooth"});}
+function showQuestion(i){
+ let cards=document.querySelectorAll("#quiz article.card"), total=cards.length;
+ stepIndex=Math.max(0,Math.min(i,total-1));
+ cards.forEach(c=>c.classList.remove("active")); cards[stepIndex].classList.add("active");
+ let human=stepIndex+1, pct=Math.round(human/total*100);
+ document.getElementById("qpLabel").textContent=`Vraag ${human} / ${total}`;
+ document.getElementById("qpTheme").textContent=questions[stepIndex].phase;
+ document.getElementById("qpFill").style.width=pct+"%";
+ document.getElementById("navCounter").textContent=`${human} / ${total}`;
+ document.getElementById("prevBtn").disabled=stepIndex===0;
+ let next=document.getElementById("nextBtn");
+ if(stepIndex===total-1){next.textContent="Score berekenen ✓"; next.classList.add("submit");}
+ else {next.textContent="Volgende →"; next.classList.remove("submit");}
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function nextQuestion(){if(stepIndex>=questions.length-1){submitQuiz();return;} showQuestion(stepIndex+1);}
+function prevQuestion(){showQuestion(stepIndex-1);}
+function submitQuiz(){calculateScore(); setPhase("review"); window.scrollTo({top:0,behavior:"smooth"});}
 renderQuiz();
 </script>
 </body>
