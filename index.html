@@ -467,18 +467,238 @@
         display: block;
       }
     }
+
+    /* ============================================================
+       APP-FLOW: start -> quiz (één vraag per scherm) -> review
+       ============================================================ */
+    .quiz-progress, .quiz-nav { display: none; }
+
+    body.phase-start .quiz-progress,
+    body.phase-start .quiz-nav,
+    body.phase-start #quizContainer,
+    body.phase-start .controls,
+    body.phase-start .result { display: none; }
+
+    body.phase-quiz .intro-panel,
+    body.phase-quiz .controls,
+    body.phase-quiz .result,
+    body.phase-quiz .section-title { display: none; }
+    body.phase-quiz .question { display: none; }
+    body.phase-quiz .question.active { display: block; animation: slideIn 0.28s ease; }
+    body.phase-quiz .quiz-progress { display: block; }
+    body.phase-quiz .quiz-nav { display: flex; }
+
+    body.phase-review .intro-panel,
+    body.phase-review .quiz-progress,
+    body.phase-review .quiz-nav { display: none; }
+    body.phase-review .controls { display: flex; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* Startknop */
+    .start-btn {
+      margin-top: 20px;
+      width: 100%;
+      font-size: 1.05rem;
+      padding: 15px;
+    }
+
+    /* Sticky voortgangsheader */
+    .quiz-progress {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(244, 246, 248, 0.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 12px 2px 14px;
+      margin-bottom: 6px;
+    }
+
+    .qp-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+
+    .qp-top #qpLabel {
+      font-weight: 800;
+      color: var(--primary-dark);
+      font-size: 0.95rem;
+    }
+
+    .qp-theme {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #155e75;
+      background: #ecfeff;
+      border: 1px solid #a5f3fc;
+      padding: 3px 10px;
+      border-radius: 999px;
+      max-width: 55%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .qp-bar {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .qp-fill {
+      height: 100%;
+      width: 2%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--primary), #14b8a6);
+      transition: width 0.3s ease;
+    }
+
+    /* Sticky navigatiebalk onderaan */
+    .quiz-nav {
+      position: sticky;
+      bottom: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      padding: 14px 2px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      background: linear-gradient(to top, var(--bg) 65%, rgba(244, 246, 248, 0));
+    }
+
+    .quiz-nav button {
+      flex: 1 1 0;
+      max-width: 220px;
+      width: auto;
+    }
+
+    .nav-counter {
+      flex: 0 0 auto;
+      font-weight: 800;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    #nextBtn.submit { background: var(--good); }
+    #nextBtn.submit:hover { background: #166534; }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Antwoorden als grote tikbare kaarten met letter-badge */
+    .answers { gap: 10px; }
+
+    label.answer {
+      align-items: center;
+      padding: 14px 16px;
+    }
+
+    /* Radio visueel verbergen, wel toegankelijk houden */
+    label.answer input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+      pointer-events: none;
+    }
+
+    .opt-badge {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #374151;
+      font-weight: 800;
+      font-size: 0.95rem;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .opt-text { flex: 1 1 auto; }
+
+    label.answer:has(input:checked) .opt-badge {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Review: juiste/foute antwoorden markeren */
+    label.answer.correct-answer {
+      background: var(--soft-good);
+      border-color: var(--good);
+      box-shadow: inset 0 0 0 1px var(--good);
+    }
+    label.answer.correct-answer .opt-badge { background: var(--good); color: #fff; }
+    label.answer.correct-answer .opt-text::after {
+      content: " ✓"; color: var(--good); font-weight: 800;
+    }
+
+    label.answer.wrong-answer {
+      background: var(--soft-bad);
+      border-color: var(--bad);
+      box-shadow: inset 0 0 0 1px var(--bad);
+    }
+    label.answer.wrong-answer .opt-badge { background: var(--bad); color: #fff; }
+    label.answer.wrong-answer .opt-text::after {
+      content: " ✗"; color: var(--bad); font-weight: 800;
+    }
+
+    /* Resultaat: score-ring */
+    .score-circle {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      margin: 8px auto 16px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      background: conic-gradient(var(--primary) var(--pct, 0%), #e5e7eb 0);
+    }
+    .score-circle::before {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      border-radius: 50%;
+      background: var(--card);
+    }
+    .score-circle span {
+      position: relative;
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    @media (max-width: 480px) {
+      .quiz-nav button { max-width: none; padding: 13px 10px; }
+      .quiz-nav { gap: 8px; }
+      .nav-counter { font-size: 0.85rem; }
+    }
   </style>
 </head>
-<body>
+<body class="phase-start">
   <header>
     <h1>Kemin Maintenance Manager Quiz</h1>
     <p>Uitgebreide sollicitatievoorbereiding voor de functie Maintenance Manager in Herentals: maintenance leadership, CMMS, RCA, preventive maintenance, GMP, safety, contractors, budgetcontrole en samenwerking met productie.</p>
   </header>
 
   <main>
-    <section class="panel">
+    <section class="panel intro-panel">
       <h2>Hoe werkt deze quiz?</h2>
-      <p>Beantwoord alle vragen. Klik daarna op <strong>Score berekenen</strong>. Je krijgt je totaalresultaat, niveau, concrete feedback, modelantwoorden en per antwoord een uitgebreide uitleg waarom het wel of niet sterk is.</p>
+      <p>Je beantwoordt de 54 vragen <strong>één voor één</strong> en navigeert met <strong>Vorige</strong> en <strong>Volgende</strong>. Op de laatste vraag klik je op <strong>Score berekenen</strong>. Daarna krijg je je totaalresultaat, niveau, concrete feedback, modelantwoorden en per antwoord een uitgebreide uitleg.</p>
       <div class="intro-grid">
         <div class="mini-card">
           <strong>Doel</strong>
@@ -486,32 +706,28 @@
         </div>
         <div class="mini-card">
           <strong>Score</strong>
-          Elke vraag telt voor 1 punt. Er zijn 50 vragen.
+          Elke vraag telt voor 1 punt. Er zijn 54 vragen.
         </div>
         <div class="mini-card">
           <strong>Tip</strong>
           Leer vooral de modelantwoorden hardop formuleren.
         </div>
       </div>
+      <button class="start-btn" onclick="startQuiz()">Start de quiz →</button>
     </section>
 
-    <section class="panel controls">
-      <div class="score-box">
-        <span class="score-pill" id="answeredCount">Beantwoord: 0 / 50</span>
-        <span class="score-pill" id="liveScore">Score: nog niet berekend</span>
+    <!-- Sticky voortgangsheader (tijdens de quiz) -->
+    <div class="quiz-progress" id="quizProgress">
+      <div class="qp-top">
+        <span id="qpLabel">Vraag 1 / 54</span>
+        <span id="qpTheme" class="qp-theme"></span>
       </div>
-      <div>
-        <button onclick="calculateScore()">Score berekenen</button>
-        <button class="secondary" onclick="showAllModelAnswers()">Toon modelantwoorden</button>
-        <button class="light" onclick="resetQuiz()">Reset</button>
-      </div>
-      <div class="progress-wrap">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-    </section>
+      <div class="qp-bar"><div class="qp-fill" id="qpFill"></div></div>
+    </div>
 
     <section class="panel result" id="resultPanel">
       <h2>Jouw resultaat</h2>
+      <div class="score-circle" id="scoreCircle"><span id="scorePct">0%</span></div>
       <p id="scoreText"></p>
       <p class="level" id="levelText"></p>
       <p id="adviceText"></p>
@@ -519,7 +735,29 @@
       <ul class="review-list" id="reviewList"></ul>
     </section>
 
+    <section class="panel controls">
+      <div class="score-box">
+        <span class="score-pill" id="answeredCount">Beantwoord: 0 / 54</span>
+        <span class="score-pill" id="liveScore">Score: nog niet berekend</span>
+      </div>
+      <div>
+        <button onclick="calculateScore()">Herbereken</button>
+        <button class="secondary" onclick="showAllModelAnswers()">Toon modelantwoorden</button>
+        <button class="light" onclick="resetQuiz()">Opnieuw beginnen</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </section>
+
     <div id="quizContainer"></div>
+
+    <!-- Navigatiebalk (tijdens de quiz) -->
+    <div class="quiz-nav" id="quizNav">
+      <button class="light" id="prevBtn" onclick="prevQuestion()">← Vorige</button>
+      <span class="nav-counter" id="navCounter">1 / 54</span>
+      <button id="nextBtn" onclick="nextQuestion()">Volgende →</button>
+    </div>
   </main>
 
   <footer>
@@ -1305,7 +1543,8 @@
               ${item.answers.map((answer, answerIndex) => `
                 <label class="answer">
                   <input type="radio" name="q${index}" value="${answerIndex}" onchange="updateProgress()" />
-                  ${String.fromCharCode(65 + answerIndex)}. ${answer}
+                  <span class="opt-badge">${String.fromCharCode(65 + answerIndex)}</span>
+                  <span class="opt-text">${answer}</span>
                 </label>
               `).join("")}
             </div>
@@ -1473,6 +1712,13 @@
           }
         }
 
+        const labels = document.querySelectorAll(`#question-${index} label.answer`);
+        labels.forEach((lab, li) => {
+          lab.classList.remove("correct-answer", "wrong-answer");
+          if (li === item.correct) lab.classList.add("correct-answer");
+          else if (li === selected) lab.classList.add("wrong-answer");
+        });
+
         model.classList.add("show");
         analysis.innerHTML = buildAnswerAnalysis(item, index);
         analysis.classList.add("show");
@@ -1480,6 +1726,10 @@
 
       const percentage = Math.round((score / questions.length) * 100);
       document.getElementById("liveScore").textContent = `Score: ${score} / ${questions.length} (${percentage}%)`;
+
+      const scoreCircle = document.getElementById("scoreCircle");
+      scoreCircle.style.setProperty("--pct", percentage + "%");
+      document.getElementById("scorePct").textContent = `${percentage}%`;
 
       const resultPanel = document.getElementById("resultPanel");
       const scoreText = document.getElementById("scoreText");
@@ -1542,9 +1792,71 @@
         item.classList.remove("show");
         item.innerHTML = "";
       });
+      document.querySelectorAll("label.answer").forEach(lab =>
+        lab.classList.remove("correct-answer", "wrong-answer"));
       document.getElementById("resultPanel").classList.remove("show");
       document.getElementById("liveScore").textContent = "Score: nog niet berekend";
       updateProgress();
+      setPhase("start");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ===== App-flow: één vraag per scherm ===== */
+    let current = 0;
+
+    function setPhase(phase) {
+      document.body.className = `phase-${phase}`;
+    }
+
+    function startQuiz() {
+      current = 0;
+      setPhase("quiz");
+      showQuestion(0);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showQuestion(i) {
+      const cards = document.querySelectorAll(".question");
+      const total = cards.length;
+      current = Math.max(0, Math.min(i, total - 1));
+
+      cards.forEach(c => c.classList.remove("active"));
+      cards[current].classList.add("active");
+
+      const human = current + 1;
+      const pct = Math.round((human / total) * 100);
+      document.getElementById("qpLabel").textContent = `Vraag ${human} / ${total}`;
+      document.getElementById("qpTheme").textContent = questions[current].theme;
+      document.getElementById("qpFill").style.width = `${pct}%`;
+      document.getElementById("navCounter").textContent = `${human} / ${total}`;
+
+      document.getElementById("prevBtn").disabled = current === 0;
+      const next = document.getElementById("nextBtn");
+      if (current === total - 1) {
+        next.textContent = "Score berekenen ✓";
+        next.classList.add("submit");
+      } else {
+        next.textContent = "Volgende →";
+        next.classList.remove("submit");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function nextQuestion() {
+      if (current >= questions.length - 1) {
+        submitQuiz();
+        return;
+      }
+      showQuestion(current + 1);
+    }
+
+    function prevQuestion() {
+      showQuestion(current - 1);
+    }
+
+    function submitQuiz() {
+      calculateScore();
+      setPhase("review");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
