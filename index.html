@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kemin Maintenance Manager Quiz met uitgebreide uitleg</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --good: #15803d;
+      --bad: #b91c1c;
+      --warn: #b45309;
+      --soft-good: #dcfce7;
+      --soft-bad: #fee2e2;
+      --soft-info: #e0f2fe;
+      --shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f766e, #134e4a);
+      color: white;
+      padding: 36px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+    }
+
+    header p {
+      margin: 0 auto;
+      max-width: 900px;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px 50px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .mini-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fafafa;
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--primary-dark);
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 16px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    button.secondary {
+      background: #374151;
+    }
+
+    button.secondary:hover {
+      background: #111827;
+    }
+
+    button.light {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button.light:hover {
+      background: #d1d5db;
+    }
+
+    .score-box {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    .score-pill {
+      background: var(--soft-info);
+      color: #075985;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid #bae6fd;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      background: #e5e7eb;
+      border-radius: 999px;
+      height: 14px;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.25s ease;
+    }
+
+    .section-title {
+      margin: 28px 0 12px;
+      color: #111827;
+      border-left: 6px solid var(--primary);
+      padding-left: 12px;
+    }
+
+    .question {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin: 14px 0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .question h3 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      background: #ecfeff;
+      color: #155e75;
+      border: 1px solid #a5f3fc;
+    }
+
+    .answers {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    label.answer {
+      display: block;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fafafa;
+      cursor: pointer;
+    }
+
+    label.answer:hover {
+      background: #f0fdfa;
+      border-color: #5eead4;
+    }
+
+    label.answer input {
+      margin-right: 8px;
+    }
+
+    .feedback {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .feedback.good {
+      display: block;
+      background: var(--soft-good);
+      border-color: #86efac;
+      color: #14532d;
+    }
+
+    .feedback.bad {
+      display: block;
+      background: var(--soft-bad);
+      border-color: #fecaca;
+      color: #7f1d1d;
+    }
+
+    .model-answer {
+      display: none;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px dashed #9ca3af;
+    }
+
+    .model-answer.show {
+      display: block;
+    }
+
+    .answer-analysis {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 12px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+    }
+
+    .answer-analysis.show {
+      display: block;
+    }
+
+    .analysis-title {
+      font-weight: 800;
+      color: #9a3412;
+      margin-bottom: 8px;
+    }
+
+    .option-explain {
+      margin: 9px 0;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+    }
+
+    .option-explain.correct-option {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .option-explain.wrong-option {
+      border-color: #fecaca;
+      background: #fff1f2;
+    }
+
+    .how-box {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .result {
+      display: none;
+      border: 2px solid var(--primary);
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result h2 {
+      margin-top: 0;
+    }
+
+    .level {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .level.excellent { color: var(--good); }
+    .level.good { color: var(--primary-dark); }
+    .level.medium { color: var(--warn); }
+    .level.low { color: var(--bad); }
+
+    .review-list {
+      margin-top: 14px;
+      padding-left: 20px;
+    }
+
+    .review-list li {
+      margin-bottom: 7px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 24px;
+    }
+
+    @media (max-width: 800px) {
+      .intro-grid {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 1.55rem;
+      }
+
+      .controls {
+        align-items: stretch;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      header, .controls, .progress-wrap, footer {
+        display: none;
+      }
+
+      body {
+        background: white;
+      }
+
+      .panel, .question {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      .model-answer {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kemin Maintenance Manager Quiz</h1>
+    <p>Uitgebreide sollicitatievoorbereiding voor de functie Maintenance Manager in Herentals: maintenance leadership, CMMS, RCA, preventive maintenance, GMP, safety, contractors, budgetcontrole en samenwerking met productie.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Hoe werkt deze quiz?</h2>
+      <p>Beantwoord alle vragen. Klik daarna op <strong>Score berekenen</strong>. Je krijgt je totaalresultaat, niveau, concrete feedback, modelantwoorden en per antwoord een uitgebreide uitleg waarom het wel of niet sterk is.</p>
+      <div class="intro-grid">
+        <div class="mini-card">
+          <strong>Doel</strong>
+          Interviewklaar worden voor Kemin Maintenance Manager.
+        </div>
+        <div class="mini-card">
+          <strong>Score</strong>
+          Elke vraag telt voor 1 punt. Er zijn 50 vragen.
+        </div>
+        <div class="mini-card">
+          <strong>Tip</strong>
+          Leer vooral de modelantwoorden hardop formuleren.
+        </div>
+      </div>
+    </section>
+
+    <section class="panel controls">
+      <div class="score-box">
+        <span class="score-pill" id="answeredCount">Beantwoord: 0 / 50</span>
+        <span class="score-pill" id="liveScore">Score: nog niet berekend</span>
+      </div>
+      <div>
+        <button onclick="calculateScore()">Score berekenen</button>
+        <button class="secondary" onclick="showAllModelAnswers()">Toon modelantwoorden</button>
+        <button class="light" onclick="resetQuiz()">Reset</button>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </section>
+
+    <section class="panel result" id="resultPanel">
+      <h2>Jouw resultaat</h2>
+      <p id="scoreText"></p>
+      <p class="level" id="levelText"></p>
+      <p id="adviceText"></p>
+      <h3>Thema’s om te herhalen</h3>
+      <ul class="review-list" id="reviewList"></ul>
+    </section>
+
+    <div id="quizContainer"></div>
+  </main>
+
+  <footer>
+    Kemin Maintenance Manager Interview Quiz — offline HTML-versie
+  </footer>
+
+  <script>
+    const questions = [
+      {
+        section: "1. Rolbegrip en prioriteiten",
+        theme: "Rolbegrip",
+        q: "Wat is het hoofddoel van de Maintenance Manager bij Kemin?",
+        answers: [
+          "Alleen storingen oplossen wanneer productie belt.",
+          "Maximale equipment uptime realiseren via preventief onderhoud, snelle troubleshooting en correct CMMS-gebruik.",
+          "Alleen externe contractors aansturen.",
+          "Alleen het onderhoudsbudget rapporteren."
+        ],
+        correct: 1,
+        model: "Het hoofddoel is maximale equipment uptime. Dat bereik je door preventief onderhoud goed te organiseren, storingen snel én structureel op te lossen, CMMS-data te gebruiken en dagelijks samen te werken met productie.",
+        why: "Dit is sterk omdat het de kernwoorden uit de vacature combineert: uptime, preventive maintenance, breakdown troubleshooting en CMMS."
+      },
+      {
+        section: "1. Rolbegrip en prioriteiten",
+        theme: "Rolbegrip",
+        q: "Wat betekent 'hands-on maintenance leader' het best?",
+        answers: [
+          "Dat je alle storingen zelf moet herstellen.",
+          "Dat je zichtbaar bent op de vloer, technische problemen begrijpt en je team praktisch ondersteunt.",
+          "Dat je vooral achter je bureau rapporten maakt.",
+          "Dat je alleen met leveranciers spreekt."
+        ],
+        correct: 1,
+        model: "Hands-on betekent dat ik aanwezig ben op de vloer, technische problemen begrijp, de juiste vragen stel en mijn team help prioriteiten te zetten. Ik hoef niet elke storing zelf te herstellen, maar ik moet technisch sterk genoeg zijn om risico’s en oplossingen te beoordelen.",
+        why: "Je positioneert jezelf als technisch geloofwaardige leider, niet als puur administratieve manager."
+      },
+      {
+        section: "1. Rolbegrip en prioriteiten",
+        theme: "Safety/GMP",
+        q: "Wat is de sterkste prioriteitenvolgorde in een maintenanceomgeving zoals Kemin?",
+        answers: [
+          "Kosten, snelheid, productie, veiligheid.",
+          "Uptime, kosten, kwaliteit, veiligheid.",
+          "Safety, quality, uptime, cost.",
+          "Productie, snelheid, budget, administratie."
+        ],
+        correct: 2,
+        model: "Mijn volgorde is safety, quality, uptime en cost. Productie is belangrijk, maar nooit ten koste van veiligheid of productkwaliteit.",
+        why: "In een feed/food-gerelateerde productieomgeving zijn veiligheid, GMP en kwaliteit niet onderhandelbaar."
+      },
+      {
+        section: "1. Rolbegrip en prioriteiten",
+        theme: "Samenwerking productie",
+        q: "Waarom is dagelijkse afstemming met productie belangrijk?",
+        answers: [
+          "Omdat maintenance anders geen werk heeft.",
+          "Omdat productie altijd beslist wat maintenance moet doen.",
+          "Omdat onderhoudsprioriteiten, stilstanden en risico’s samen afgestemd moeten worden voor smooth plant performance.",
+          "Omdat CMMS alleen door productie wordt ingevuld."
+        ],
+        correct: 2,
+        model: "Maintenance en productie moeten als één team werken. Dagelijkse afstemming zorgt dat prioriteiten duidelijk zijn, stilstanden goed gepland worden en technische risico’s tijdig besproken worden.",
+        why: "De vacature noemt expliciet nauwe coördinatie met productie."
+      },
+      {
+        section: "2. Teamleiding",
+        theme: "Teamleiding",
+        q: "Wat is de beste aanpak om een onderhoudsteam te leiden?",
+        answers: [
+          "Alle beslissingen zelf nemen en weinig delegeren.",
+          "Sturen op veiligheid, duidelijke verwachtingen, coaching, ownership en werkorderdiscipline.",
+          "Alleen controleren of iedereen aanwezig is.",
+          "Techniekers alleen beoordelen op snelheid."
+        ],
+        correct: 1,
+        model: "Ik stuur op duidelijke prioriteiten: safety first, quality second, uptime third en cost control daarna. Ik gebruik dagstarts, shift-overdracht, coaching en duidelijke werkorders. Ik geef techniekers ownership over installaties.",
+        why: "Dit toont people leadership én operationele structuur."
+      },
+      {
+        section: "2. Teamleiding",
+        theme: "Teamleiding",
+        q: "Hoe bouw je een high-performing maintenance team?",
+        answers: [
+          "Door alleen de sterkste technieker alle moeilijke storingen te geven.",
+          "Door duidelijke rollen, competentiematrix, opleiding, feedback, eigenaarschap en KPI-opvolging.",
+          "Door minder overleg en meer druk.",
+          "Door alles uit te besteden aan contractors."
+        ],
+        correct: 1,
+        model: "Een sterk team bouw je met duidelijke rollen, technische opleiding, ownership per installatie, goede communicatie en discipline rond safety en CMMS. Techniekers moeten niet alleen herstellen, maar ook verbeteren.",
+        why: "Kemin zoekt iemand die het team kan leiden, coachen en ontwikkelen."
+      },
+      {
+        section: "2. Teamleiding",
+        theme: "CMMS",
+        q: "Een technieker vult werkorders slecht in. Wat doe je?",
+        answers: [
+          "Negeren zolang de machine draait.",
+          "De technieker meteen vervangen.",
+          "Uitleggen waarom CMMS belangrijk is, training geven indien nodig en daarna consequent opvolgen.",
+          "Alle CMMS-registratie zelf doen."
+        ],
+        correct: 2,
+        model: "Ik spreek de technieker aan, leg uit waarom correcte data belangrijk is, check of extra training nodig is en volg daarna consequent op. CMMS is de basis voor reliability, dus slechte input kunnen we niet accepteren.",
+        why: "Je combineert coaching, training en discipline."
+      },
+      {
+        section: "2. Teamleiding",
+        theme: "Teamleiding",
+        q: "Hoe verander je een firefighting-cultuur?",
+        answers: [
+          "Door storingen sneller te blijven oplossen zonder analyse.",
+          "Door techniekers te betrekken bij RCA, preventieve verbeteringen en ownership per machine.",
+          "Door minder preventief onderhoud te doen.",
+          "Door alleen meer contractors in te huren."
+        ],
+        correct: 1,
+        model: "Ik erken de inzet van techniekers, maar verschuif de mindset: de beste technieker is niet alleen degene die snel herstelt, maar ook degene die voorkomt dat het probleem terugkomt.",
+        why: "Je toont dat je van reactief onderhoud naar reliability wilt gaan."
+      },
+      {
+        section: "3. CMMS en data-driven maintenance",
+        theme: "CMMS",
+        q: "Wat is CMMS?",
+        answers: [
+          "Een systeem voor onderhoudsbeheer: werkorders, PM, storingen, spare parts, kosten en rapportage.",
+          "Een systeem voor verkooprapportage.",
+          "Een veiligheidstraining.",
+          "Een type pomp."
+        ],
+        correct: 0,
+        model: "CMMS is het centrale onderhoudssysteem voor werkorders, preventief onderhoud, storingen, spare parts, kosten, assethistoriek en KPI’s. Voor mij is CMMS geen administratie, maar een stuurinstrument.",
+        why: "Dit is een kernbegrip uit de vacature."
+      },
+      {
+        section: "3. CMMS en data-driven maintenance",
+        theme: "CMMS",
+        q: "Welke CMMS-data moet zeker correct zijn?",
+        answers: [
+          "Alleen namen van techniekers.",
+          "Assetstructuur, storingscodes, oorzaakcodes, werkuren, gebruikte onderdelen, downtime, acties en kosten.",
+          "Alleen factuurnummers.",
+          "Alleen de namen van leveranciers."
+        ],
+        correct: 1,
+        model: "Ik wil correcte assetstructuur, storingscodes, oorzaakcodes, werkuren, onderdelen, downtime, acties, PM-status en kosten. Zonder betrouwbare input kun je geen goede analyse maken.",
+        why: "Je laat zien dat je CMMS praktisch kunt gebruiken voor reliability."
+      },
+      {
+        section: "3. CMMS en data-driven maintenance",
+        theme: "CMMS",
+        q: "Wat controleer je in de eerste 90 dagen in CMMS?",
+        answers: [
+          "Alleen de kleur van het dashboard.",
+          "Assetstructuur, kritische machines, werkorderkwaliteit, PM-compliance, openstaande werkorders, storingshistoriek en spare parts.",
+          "Alleen oude facturen.",
+          "Alleen gebruikersnamen."
+        ],
+        correct: 1,
+        model: "Ik controleer assetstructuur, kritische installaties, open werkorders, PM-compliance, storingshistoriek, spare parts-koppeling en rapportagekwaliteit. Daarna bepaal ik verbeterprioriteiten.",
+        why: "Dit toont een professionele onboarding-aanpak."
+      },
+      {
+        section: "3. CMMS en data-driven maintenance",
+        theme: "CMMS",
+        q: "Wat doe je als CMMS-data onbetrouwbaar is?",
+        answers: [
+          "Dan gebruik je alleen buikgevoel.",
+          "Dan verbeter je eerst de basis: codes standaardiseren, team trainen, invulinstructies maken en werkorderkwaliteit opvolgen.",
+          "Dan stop je met CMMS.",
+          "Dan laat je alleen productie data invullen."
+        ],
+        correct: 1,
+        model: "Als CMMS-data slecht is, verbeter ik eerst de basis: duidelijke storingscodes, training, eenvoudige invulinstructies en opvolging. Data-driven maintenance kan alleen met betrouwbare input.",
+        why: "Je klinkt realistisch; veel bedrijven hebben datakwaliteitsproblemen."
+      },
+      {
+        section: "4. Downtime, MTTR en MTBF",
+        theme: "Downtime",
+        q: "Hoe pak je downtime-reductie concreet aan?",
+        answers: [
+          "Iedere storing sneller oplossen en daarna niets registreren.",
+          "Topverliezen analyseren per machine, oorzaak, frequentie en duur; daarna RCA, PM-aanpassing, training en spare parts verbeteren.",
+          "Preventief onderhoud verminderen.",
+          "Alle storingen aan operators overlaten."
+        ],
+        correct: 1,
+        model: "Ik start met data: welke machines veroorzaken de meeste downtime, hoe vaak, hoe lang en waarom? Daarna pak ik de topverliezen aan met RCA, betere PM, spare parts, training en opvolging via KPI’s.",
+        why: "Je geeft een concreet, data-gedreven stappenplan."
+      },
+      {
+        section: "4. Downtime, MTTR en MTBF",
+        theme: "Downtime",
+        q: "Wat betekent MTTR?",
+        answers: [
+          "Mean Time To Repair.",
+          "Machine Technical Test Report.",
+          "Maintenance Team Training Record.",
+          "Mean Time To Restart."
+        ],
+        correct: 0,
+        model: "MTTR betekent Mean Time To Repair: de gemiddelde tijd die nodig is om een storing te herstellen. Lage MTTR is goed, zolang veiligheid en kwaliteit geborgd blijven.",
+        why: "Kemin vraagt snelle breakdown troubleshooting."
+      },
+      {
+        section: "4. Downtime, MTTR en MTBF",
+        theme: "Downtime",
+        q: "Hoe verlaag je MTTR?",
+        answers: [
+          "Door sneller te werken zonder veiligheidscontrole.",
+          "Door betere troubleshooting, spare parts beschikbaarheid, documentatie, training, escalatie en shift-overdracht.",
+          "Door minder te registreren.",
+          "Door PM te stoppen."
+        ],
+        correct: 1,
+        model: "Ik verlaag MTTR door duidelijke storingsprocedures, goede opleiding, juiste spare parts, technische documentatie, snelle escalatie en goede shift-overdracht.",
+        why: "Je noemt praktische verbeterhefbomen."
+      },
+      {
+        section: "4. Downtime, MTTR en MTBF",
+        theme: "Downtime",
+        q: "Wat betekent MTBF?",
+        answers: [
+          "Maintenance Time Before Failure.",
+          "Mean Time Between Failures.",
+          "Machine Test Before Fix.",
+          "Maintenance Technical Budget Forecast."
+        ],
+        correct: 1,
+        model: "MTBF betekent Mean Time Between Failures: de gemiddelde tijd tussen twee storingen. Hoge MTBF betekent betere betrouwbaarheid.",
+        why: "Dit is een basis-KPI voor reliability."
+      },
+      {
+        section: "4. Downtime, MTTR en MTBF",
+        theme: "Downtime",
+        q: "Hoe verhoog je MTBF?",
+        answers: [
+          "Door terugkerende storingen structureel aan te pakken met RCA, betere PM, correcte onderdelen, training en procesverbeteringen.",
+          "Door storingen minder vaak te registreren.",
+          "Door alleen sneller te herstellen.",
+          "Door machines langer te laten draaien zonder inspectie."
+        ],
+        correct: 0,
+        model: "Ik verhoog MTBF door terugkerende storingen te elimineren: RCA, PM verbeteren, componentkwaliteit controleren, operatorgebruik verbeteren en technische modificaties uitvoeren waar nodig.",
+        why: "Je focust op betrouwbaarheid en niet alleen op snelheid."
+      },
+      {
+        section: "5. RCA en probleemoplossing",
+        theme: "RCA",
+        q: "Wat is RCA?",
+        answers: [
+          "Een methode om de echte oorzaak van een probleem te vinden.",
+          "Een aankoopprocedure.",
+          "Een veiligheidshelm.",
+          "Een type onderhoudscontract."
+        ],
+        correct: 0,
+        model: "RCA staat voor Root Cause Analysis. Het betekent dat je de echte oorzaak zoekt, niet alleen het symptoom oplost. Het doel is herhaling voorkomen.",
+        why: "RCA wordt expliciet gevraagd in de vacature."
+      },
+      {
+        section: "5. RCA en probleemoplossing",
+        theme: "RCA",
+        q: "Wanneer gebruik je RCA?",
+        answers: [
+          "Bij elke kleine administratieve fout.",
+          "Bij kritische storingen, herhalingsstoringen, veiligheidsrisico’s, kwaliteitsimpact of hoge downtime.",
+          "Alleen tijdens audits.",
+          "Nooit, want storingen moeten gewoon snel opgelost worden."
+        ],
+        correct: 1,
+        model: "Ik gebruik RCA bij kritische of terugkerende storingen, hoge downtime, safety- of kwaliteitsimpact. Niet elke kleine storing vraagt een zware RCA, maar belangrijke verliezen wel.",
+        why: "Je toont pragmatisch oordeel."
+      },
+      {
+        section: "5. RCA en probleemoplossing",
+        theme: "RCA",
+        q: "Welke RCA-methodes passen goed bij maintenance?",
+        answers: [
+          "5 Why, Ishikawa, Pareto, 8D en FMEA.",
+          "Alleen brainstormen.",
+          "Alleen trial-and-error.",
+          "Alleen leverancier bellen."
+        ],
+        correct: 0,
+        model: "Afhankelijk van de situatie gebruik ik 5 Why, Ishikawa, Pareto, 8D of FMEA. Voor snelle problemen kan 5 Why volstaan; voor complexere problemen werk ik teamgericht.",
+        why: "Je toont dat je meerdere probleemoplossingstools kent."
+      },
+      {
+        section: "5. RCA en probleemoplossing",
+        theme: "RCA",
+        q: "Een pompseal gaat telkens stuk. Wat is een goede RCA-denkwijze?",
+        answers: [
+          "Elke week de seal vervangen.",
+          "Onderzoeken waarom de seal faalt: droogloop, uitlijning, medium, druk, temperatuur, verkeerde montage of procescondities.",
+          "De storing niet meer registreren.",
+          "Alleen productie de schuld geven."
+        ],
+        correct: 1,
+        model: "Ik kijk verder dan het defecte onderdeel. Waarom faalt de seal? Mogelijke oorzaken zijn droogloop, slechte uitlijning, verkeerd materiaal, procescondities of operatorgebruik. De oplossing moet de echte oorzaak aanpakken.",
+        why: "Dit klinkt technisch en concreet."
+      },
+      {
+        section: "6. Preventive en corrective maintenance",
+        theme: "Preventive Maintenance",
+        q: "Wat is preventive maintenance?",
+        answers: [
+          "Gepland onderhoud om storingen te voorkomen.",
+          "Onderhoud na een plotse breakdown.",
+          "Alleen schoonmaken.",
+          "Alleen aankoop van onderdelen."
+        ],
+        correct: 0,
+        model: "Preventive maintenance is gepland onderhoud om storingen te voorkomen: inspecties, smering, filterwissels, kalibratie, testen van sensoren, controle van lagers, riemen en veiligheidsfuncties.",
+        why: "Preventief onderhoud is een kernpunt in de functie."
+      },
+      {
+        section: "6. Preventive en corrective maintenance",
+        theme: "Preventive Maintenance",
+        q: "Hoe bouw je een goed PM-programma op?",
+        answers: [
+          "Voor alle machines exact hetzelfde onderhoud.",
+          "Risico-gebaseerd: kritische assets, storingshistoriek, leverancierseisen, veiligheid, kwaliteit en productie-impact.",
+          "Alleen op basis van wat de technieker graag doet.",
+          "Door PM zo veel mogelijk te vermijden."
+        ],
+        correct: 1,
+        model: "Ik start met kritische assets en kijk naar storingshistoriek, safety, kwaliteit, GMP-impact, productie-impact en leveranciersvoorschriften. Daarna bepaal ik frequentie, taken, onderdelen en planning.",
+        why: "Je toont dat PM niet blind maar risico-gebaseerd moet zijn."
+      },
+      {
+        section: "6. Preventive en corrective maintenance",
+        theme: "Preventive Maintenance",
+        q: "Wat is PM-compliance?",
+        answers: [
+          "Het percentage geplande PM-taken dat op tijd en correct is uitgevoerd.",
+          "Het aantal techniekers in het team.",
+          "De kost van contractors.",
+          "Het aantal purchase orders."
+        ],
+        correct: 0,
+        model: "PM-compliance betekent hoeveel geplande preventieve onderhoudstaken op tijd en correct zijn uitgevoerd. Belangrijk: niet alleen de score telt, ook de kwaliteit van uitvoering.",
+        why: "Je koppelt KPI aan echte uitvoeringskwaliteit."
+      },
+      {
+        section: "6. Preventive en corrective maintenance",
+        theme: "Preventive Maintenance",
+        q: "Hoe weet je of PM effectief is?",
+        answers: [
+          "Als er veel werkorders zijn.",
+          "Als ongeplande downtime daalt, MTBF stijgt, noodinterventies dalen en prestaties stabieler worden.",
+          "Als techniekers druk bezig zijn.",
+          "Als productie nooit vragen stelt."
+        ],
+        correct: 1,
+        model: "Effectieve PM zie je in de resultaten: minder ongeplande downtime, hogere MTBF, minder noodinterventies, minder herhalingsstoringen en stabielere productie.",
+        why: "Je koppelt PM aan meetbare business impact."
+      },
+      {
+        section: "6. Preventive en corrective maintenance",
+        theme: "Preventive Maintenance",
+        q: "Wat is corrective maintenance?",
+        answers: [
+          "Onderhoud nadat een defect is vastgesteld, gepland of ongepland.",
+          "Alleen preventieve inspectie.",
+          "Alleen kalibratie.",
+          "Alleen 5S."
+        ],
+        correct: 0,
+        model: "Corrective maintenance is onderhoud nadat een defect is vastgesteld. Dat kan gepland zijn na inspectie of ongepland bij een plotse storing.",
+        why: "De vacature vraagt ervaring met preventive en corrective maintenance."
+      },
+      {
+        section: "7. Contractors en externe partners",
+        theme: "Contractors",
+        q: "Wat is de beste aanpak voor contractor management?",
+        answers: [
+          "Contractors zelfstandig laten werken zonder opvolging.",
+          "Duidelijke scope, planning, veiligheidsinstructies, vergunningen, GMP-regels, toezicht, oplevering en documentatie.",
+          "Altijd de goedkoopste contractor kiezen.",
+          "Alleen achteraf controleren."
+        ],
+        correct: 1,
+        model: "Ik begin met duidelijke scope, planning, veiligheidsvereisten en kwaliteitseisen. Voor start: werkvergunning, risicoanalyse, GMP-instructie en lockout/tagout. Tijdens uitvoering volg ik safety, timing en kwaliteit op. Na afloop: oplevering, documentatie en CMMS-update.",
+        why: "Je toont volledige controle van begin tot einde."
+      },
+      {
+        section: "7. Contractors en externe partners",
+        theme: "Contractors",
+        q: "Een contractor werkt zonder juiste werkvergunning. Wat doe je?",
+        answers: [
+          "Niets, zolang het werk snel klaar is.",
+          "Het werk onmiddellijk stoppen, vergunning en risicoanalyse controleren en pas daarna verder laten werken.",
+          "Productie laten beslissen.",
+          "Alleen een mail sturen na afloop."
+        ],
+        correct: 1,
+        model: "Ik stop het werk onmiddellijk. Veiligheid geldt voor iedereen. Pas wanneer scope, risicoanalyse, vergunning en instructies correct zijn, mag het werk verdergaan.",
+        why: "Dit toont safety leadership."
+      },
+      {
+        section: "7. Contractors en externe partners",
+        theme: "Contractors",
+        q: "Hoe beoordeel je contractor performance?",
+        answers: [
+          "Alleen op laagste prijs.",
+          "Op veiligheid, kwaliteit, planning, communicatie, documentatie, technische competentie en kost.",
+          "Alleen op snelheid.",
+          "Alleen op wie het langst samenwerkt."
+        ],
+        correct: 1,
+        model: "Ik beoordeel contractors op safety, kwaliteit, planning, communicatie, technische competentie, documentatie en kost. De goedkoopste is niet altijd de beste als risico of downtime hoger wordt.",
+        why: "Je toont total-cost en compliance-denken."
+      },
+      {
+        section: "8. Budgetcontrole en purchase orders",
+        theme: "Budget",
+        q: "Welke kosten vallen typisch onder maintenancebudget?",
+        answers: [
+          "Spare parts, contractors, PM, correctief onderhoud, kalibraties, keuringen, gereedschappen, externe services en projecten.",
+          "Alleen salarissen van sales.",
+          "Alleen marketingkosten.",
+          "Alleen transportkosten."
+        ],
+        correct: 0,
+        model: "Maintenancebudget bevat onder meer spare parts, contractors, preventief en correctief onderhoud, kalibraties, keuringen, gereedschappen, externe services en technische projecten.",
+        why: "Je toont financieel begrip van maintenance."
+      },
+      {
+        section: "8. Budgetcontrole en purchase orders",
+        theme: "Budget",
+        q: "Hoe verlaag je onderhoudskosten zonder risico te verhogen?",
+        answers: [
+          "Door kritisch onderhoud uit te stellen.",
+          "Door betrouwbaarheid te verhogen: minder herhalingsstoringen, betere spare parts, efficiënte PM, minder noodinterventies en betere contractorafspraken.",
+          "Door minder safety-checks te doen.",
+          "Door minder te registreren."
+        ],
+        correct: 1,
+        model: "Kosten verlaag je door betrouwbaarheid te verhogen, niet door kritisch onderhoud te schrappen. Minder herhalingsstoringen, betere planning, spare parts-optimalisatie en minder noodinterventies verlagen structureel de kosten.",
+        why: "Je klinkt als een maintenance manager met business sense."
+      },
+      {
+        section: "8. Budgetcontrole en purchase orders",
+        theme: "Budget",
+        q: "Wat is belangrijk bij purchase orders voor maintenance?",
+        answers: [
+          "Alleen de laagste prijs.",
+          "Duidelijke behoefte, scope, budget, prioriteit, goedkeuring, levertijd, kwaliteit en impact op downtime.",
+          "Dat ze zo laat mogelijk worden aangemaakt.",
+          "Dat niemand ze opvolgt."
+        ],
+        correct: 1,
+        model: "Een purchase order moet gekoppeld zijn aan een duidelijke behoefte, scope, budget en prioriteit. Bij technische aankopen kijk ik ook naar levertijd, kwaliteit, standaardisatie en downtime-impact.",
+        why: "Je toont discipline rond kosten en operationele impact."
+      },
+      {
+        section: "9. Spare parts management",
+        theme: "Spare Parts",
+        q: "Waarom is spare parts management belangrijk?",
+        answers: [
+          "Omdat het magazijn zo vol mogelijk moet zijn.",
+          "Omdat ontbrekende kritische onderdelen downtime veroorzaken, maar te veel voorraad geld blokkeert.",
+          "Omdat spare parts niets met uptime te maken hebben.",
+          "Omdat CMMS dan overbodig wordt."
+        ],
+        correct: 1,
+        model: "Kritische onderdelen moeten beschikbaar zijn om downtime te vermijden, maar te veel voorraad blokkeert kapitaal. Daarom moet spare parts management gebaseerd zijn op risico, levertijd, faalkans, kost en productie-impact.",
+        why: "Je toont balans tussen beschikbaarheid en kosten."
+      },
+      {
+        section: "9. Spare parts management",
+        theme: "Spare Parts",
+        q: "Hoe bepaal je kritische spare parts?",
+        answers: [
+          "Alleen op basis van prijs.",
+          "Op basis van veiligheid, kwaliteitsimpact, productie-impact, levertijd, storingshistoriek, alternatieven, kost en herstelbaarheid.",
+          "Door alles op voorraad te leggen.",
+          "Door alleen leveranciersadvies te volgen."
+        ],
+        correct: 1,
+        model: "Ik bepaal kritische spare parts op basis van safety, kwaliteit, productie-impact, levertijd, storingshistoriek, alternatieven, kost en herstelbaarheid. Een goedkoop onderdeel met lange levertijd kan zeer kritisch zijn.",
+        why: "Je geeft een volwassen risicobenadering."
+      },
+      {
+        section: "10. GMP, Safety en SOP",
+        theme: "Safety/GMP",
+        q: "Wat betekent GMP voor maintenance?",
+        answers: [
+          "Dat onderhoud veilig, proper, gecontroleerd en traceerbaar gebeurt.",
+          "Dat maintenance niets met kwaliteit te maken heeft.",
+          "Dat alleen productie procedures moet volgen.",
+          "Dat storingen niet geregistreerd moeten worden."
+        ],
+        correct: 0,
+        model: "GMP betekent dat maintenance veilig, proper, gecontroleerd en traceerbaar werkt. Onderhoud moet contaminatie vermijden, correct documenteren, gereedschap en onderdelen beheersen en installaties correct vrijgeven.",
+        why: "Je verbindt techniek met productkwaliteit."
+      },
+      {
+        section: "10. GMP, Safety en SOP",
+        theme: "Safety/GMP",
+        q: "Wat is lockout/tagout?",
+        answers: [
+          "Een procedure om energiebronnen veilig te isoleren en vergrendelen vóór onderhoud.",
+          "Een magazijnsysteem.",
+          "Een type werkorder.",
+          "Een kwaliteitslabel."
+        ],
+        correct: 0,
+        model: "Lockout/tagout is een veiligheidsprocedure waarbij gevaarlijke energiebronnen worden geïsoleerd en vergrendeld zodat machines niet onverwacht kunnen starten tijdens onderhoud.",
+        why: "Essentieel voor maintenance safety."
+      },
+      {
+        section: "10. GMP, Safety en SOP",
+        theme: "Safety/GMP",
+        q: "Wat doe je na onderhoud in een GMP-omgeving?",
+        answers: [
+          "Machine direct starten zonder controle.",
+          "Controle, reiniging indien nodig, gereedschap verwijderen, documentatie, test, vrijgave en communicatie naar productie.",
+          "Alleen mondeling melden dat het klaar is.",
+          "Alleen CMMS sluiten."
+        ],
+        correct: 1,
+        model: "Na onderhoud zorg ik voor controle, reiniging indien nodig, verwijdering van gereedschap en onderdelen, documentatie, test, vrijgave en communicatie naar productie. Pas dan mag de lijn terug starten.",
+        why: "Je toont GMP-discipline en overdracht."
+      },
+      {
+        section: "10. GMP, Safety en SOP",
+        theme: "Safety/GMP",
+        q: "Wat is een SOP?",
+        answers: [
+          "Een standaardprocedure om taken veilig, correct en herhaalbaar uit te voeren.",
+          "Een bonusregeling.",
+          "Een softwarelicentie.",
+          "Een type sensor."
+        ],
+        correct: 0,
+        model: "SOP betekent Standard Operating Procedure: een vaste, goedgekeurde werkwijze om taken veilig, correct en herhaalbaar uit te voeren.",
+        why: "SOP’s worden expliciet genoemd in de vacature."
+      },
+      {
+        section: "10. GMP, Safety en SOP",
+        theme: "Safety/GMP",
+        q: "Wanneer moet een SOP aangepast worden?",
+        answers: [
+          "Nooit.",
+          "Bij nieuwe apparatuur, gewijzigde werkwijze, incidenten, RCA-resultaten, auditbevindingen of praktische onveiligheid.",
+          "Alleen wanneer productie klaagt.",
+          "Alleen aan het einde van het jaar."
+        ],
+        correct: 1,
+        model: "Een SOP moet aangepast worden bij nieuwe apparatuur, proceswijzigingen, incidenten, RCA-acties, auditbevindingen of wanneer de procedure niet meer veilig of praktisch is.",
+        why: "Je ziet SOP’s als levende documenten."
+      },
+      {
+        section: "11. Kalibratie, 5S en automatisering",
+        theme: "Calibration",
+        q: "Wat is kalibratie?",
+        answers: [
+          "Controleren of meetinstrumenten correct meten tegenover een referentiestandaard.",
+          "Een machine schilderen.",
+          "Een storing resetten.",
+          "Een onderdeel bestellen."
+        ],
+        correct: 0,
+        model: "Kalibratie is controleren of meetinstrumenten correct meten tegenover een referentiestandaard. Denk aan weegsystemen, temperatuur-, druk-, flow- en doseermetingen.",
+        why: "De vacature noemt calibration activities."
+      },
+      {
+        section: "11. Kalibratie, 5S en automatisering",
+        theme: "Calibration",
+        q: "Waarom is kalibratie belangrijk bij Kemin?",
+        answers: [
+          "Omdat foutieve meting kan leiden tot verkeerde dosering, kwaliteitsproblemen, batchafwijkingen en complianceproblemen.",
+          "Omdat het alleen een administratieve hobby is.",
+          "Omdat productie dan minder hoeft te werken.",
+          "Omdat het niets met kwaliteit te maken heeft."
+        ],
+        correct: 0,
+        model: "Bij ingrediëntenproductie kan foutieve meting leiden tot verkeerde dosering, kwaliteitsafwijkingen of complianceproblemen. Daarom moet kalibratie gepland, uitgevoerd en gedocumenteerd zijn.",
+        why: "Je koppelt kalibratie aan productkwaliteit."
+      },
+      {
+        section: "11. Kalibratie, 5S en automatisering",
+        theme: "5S/CI",
+        q: "Wat betekent 5S in maintenance?",
+        answers: [
+          "Sorteren, schikken, schoonmaken, standaardiseren en standhouden.",
+          "Vijf soorten storingen.",
+          "Vijf budgetlijnen.",
+          "Vijf productieploegen."
+        ],
+        correct: 0,
+        model: "5S betekent sorteren, schikken, schoonmaken, standaardiseren en standhouden. In maintenance zorgt het voor minder zoekwerk, veiligere werkplekken, betere spare parts controle en professionele discipline.",
+        why: "Kemin noemt 5S expliciet."
+      },
+      {
+        section: "11. Kalibratie, 5S en automatisering",
+        theme: "5S/CI",
+        q: "Wat is continuous improvement in deze rol?",
+        answers: [
+          "Elke storing gebruiken als kans om safety, kwaliteit, uptime, kosten en teamwerking te verbeteren.",
+          "Altijd nieuwe machines kopen.",
+          "Alleen meer vergaderen.",
+          "Alleen sneller werken."
+        ],
+        correct: 0,
+        model: "Continuous improvement betekent structureel verbeteren van veiligheid, kwaliteit, uptime, kosten, planning en teamwerking. Elke storing of afwijking is een kans om het systeem beter te maken.",
+        why: "De vacature vraagt continuous improvement initiatives."
+      },
+      {
+        section: "11. Kalibratie, 5S en automatisering",
+        theme: "Automatisering",
+        q: "Waarom is automatisering belangrijk voor een Maintenance Manager?",
+        answers: [
+          "Omdat storingen vaak te maken hebben met sensoren, PLC’s, drives, software, communicatie of procescontrole.",
+          "Omdat mechanisch onderhoud niet meer bestaat.",
+          "Omdat automatisering alleen voor IT is.",
+          "Omdat CMMS daardoor niet nodig is."
+        ],
+        correct: 0,
+        model: "Veel moderne storingen zijn niet alleen mechanisch, maar ook verbonden met sensoren, PLC’s, drives, communicatie en procescontrole. Een Maintenance Manager moet dat begrijpen om goed te prioriteren en escaleren.",
+        why: "Kemin noemt automation and process improvements."
+      },
+      {
+        section: "12. Situatievragen",
+        theme: "RCA",
+        q: "Een kritische mixer valt drie keer uit in één week. Wat is de beste aanpak?",
+        answers: [
+          "Elke keer resetten en verder draaien.",
+          "Data verzamelen, veilige heropstart, RCA met maintenance/productie, tijdelijke containment en structurele acties vastleggen.",
+          "Alleen de operator aanspreken.",
+          "Wachten tot de leverancier komt zonder analyse."
+        ],
+        correct: 1,
+        model: "Ik zorg eerst voor veiligheid en heropstart. Daarna verzamel ik CMMS-data, symptomen, timing, operatorinput en vorige interventies. Vervolgens organiseer ik een RCA met maintenance en productie, bepaal containment en structurele acties.",
+        why: "Je combineert troubleshooting, CMMS, RCA en samenwerking."
+      },
+      {
+        section: "12. Situatievragen",
+        theme: "Preventive Maintenance",
+        q: "Een kritische PM-taak wordt vaak uitgesteld door productie. Wat doe je?",
+        answers: [
+          "Altijd akkoord gaan met uitstel.",
+          "Risico uitleggen, planning samen verbeteren, impact zichtbaar maken en kritische PM toch borgen.",
+          "PM verwijderen uit het systeem.",
+          "Alleen een klacht sturen."
+        ],
+        correct: 1,
+        model: "Ik bespreek met productie waarom de PM belangrijk is en welk risico uitstel geeft. Ik zoek betere planning of combinatie met andere stops, maar kritische PM moet geborgd blijven.",
+        why: "Je toont samenwerking én standvastigheid."
+      },
+      {
+        section: "12. Situatievragen",
+        theme: "Spare Parts",
+        q: "Een kritisch onderdeel is niet op voorraad tijdens storing. Wat doe je?",
+        answers: [
+          "Alleen de magazijnier beschuldigen.",
+          "Korte termijn alternatief zoeken en daarna kritisch spare parts proces verbeteren in CMMS.",
+          "Niets doen.",
+          "Het onderdeel uit de BOM verwijderen."
+        ],
+        correct: 1,
+        model: "Op korte termijn zoek ik alternatieven: leverancier, zusterbedrijf, revisie of tijdelijke technische oplossing. Daarna onderzoek ik waarom het onderdeel niet op voorraad was en voeg ik het toe aan de kritische spare parts lijst.",
+        why: "Je lost de noodsituatie én de systeemoorzaak op."
+      },
+      {
+        section: "12. Situatievragen",
+        theme: "Budget",
+        q: "Je budget staat onder druk. Wat doe je?",
+        answers: [
+          "Alle PM schrappen.",
+          "Kosten analyseren, safety/compliance borgen en besparingen zoeken via betrouwbaarheid, minder noodinterventies, spare parts optimalisatie en contractorafspraken.",
+          "Alle contractors onmiddellijk stoppen.",
+          "Alleen goedkopere onderdelen kopen."
+        ],
+        correct: 1,
+        model: "Ik analyseer kosten per categorie en borg safety, compliance en uptime. Besparingen zoek ik via minder herhalingsstoringen, minder noodinterventies, betere spare parts en betere contractorafspraken.",
+        why: "Je toont volwassen kostenbeheersing."
+      },
+      {
+        section: "12. Situatievragen",
+        theme: "Samenwerking productie",
+        q: "Productie wil blijven draaien ondanks technisch risico. Wat doe je?",
+        answers: [
+          "Altijd laten draaien.",
+          "Risico beoordelen op safety, quality, milieu en gevolgschade. Onacceptabel risico stoppen; gecontroleerd verder draaien alleen met voorwaarden en documentatie.",
+          "De beslissing volledig bij productie leggen.",
+          "Het risico niet documenteren."
+        ],
+        correct: 1,
+        model: "Ik beoordeel safety, kwaliteit, milieu en gevolgschade. Bij onaanvaardbaar risico stop ik de installatie. Als gecontroleerd verder draaien mogelijk is, leg ik voorwaarden, monitoring, timing en documentatie vast.",
+        why: "Je toont besluitvaardigheid en risicodenken."
+      },
+      {
+        section: "13. Eerste 90 dagen",
+        theme: "Onboarding",
+        q: "Wat doe je in je eerste 30 dagen?",
+        answers: [
+          "Meteen alles veranderen.",
+          "Luisteren en observeren: team, productie, quality, safety, engineering, installaties, processen, CMMS en lopende problemen leren kennen.",
+          "Alleen rapporten lezen.",
+          "Alleen contractors ontmoeten."
+        ],
+        correct: 1,
+        model: "In de eerste 30 dagen luister en observeer ik. Ik spreek techniekers, productie, quality, safety, engineering en plant management. Ik leer installaties, processen, risico’s, teamstructuur, CMMS en lopende problemen kennen.",
+        why: "Je toont respect voor organisatie en feiten."
+      },
+      {
+        section: "13. Eerste 90 dagen",
+        theme: "Onboarding",
+        q: "Wat doe je tussen dag 30 en 60?",
+        answers: [
+          "Downtime, MTTR, MTBF, PM-compliance, open werkorders, spare parts, contractors en kosten analyseren.",
+          "Alleen wachten op instructies.",
+          "Alleen teamrooster aanpassen.",
+          "Geen data bekijken."
+        ],
+        correct: 0,
+        model: "Tussen dag 30 en 60 analyseer ik data: downtime, MTTR, MTBF, PM-compliance, open werkorders, spare parts, contractors en kosten. Daarna bepaal ik topprioriteiten en quick wins.",
+        why: "Je toont data-driven maintenance."
+      },
+      {
+        section: "13. Eerste 90 dagen",
+        theme: "Onboarding",
+        q: "Wat doe je tussen dag 60 en 90?",
+        answers: [
+          "Quick wins en structurele acties implementeren: PM-planning, CMMS-discipline, RCA op topstoringen, spare parts en KPI-dashboard.",
+          "Alleen observeren.",
+          "Alleen budget schrappen.",
+          "Geen veranderingen doen."
+        ],
+        correct: 0,
+        model: "Tussen dag 60 en 90 implementeer ik verbeteracties: betere PM-planning, CMMS-discipline, RCA op topstoringen, spare parts optimalisatie, teamafspraken en KPI-dashboard.",
+        why: "Je toont ownership en uitvoeringskracht."
+      },
+      {
+        section: "14. Motivatie en eindpitch",
+        theme: "Motivatie",
+        q: "Waarom past deze functie bij jou?",
+        answers: [
+          "Omdat het dicht bij huis is.",
+          "Omdat de rol maintenance, reliability, teamleiding, CMMS, safety, GMP, projecten en samenwerking met productie combineert.",
+          "Omdat er een bedrijfswagen is.",
+          "Omdat je geen technische kennis nodig hebt."
+        ],
+        correct: 1,
+        model: "Deze functie past bij mij omdat ze maintenance, reliability, teamleiding, CMMS, safety, GMP, projecten en samenwerking met productie combineert. Ik zie maintenance als driver van plant performance.",
+        why: "Je koppelt jouw motivatie direct aan de kern van de vacature."
+      },
+      {
+        section: "14. Motivatie en eindpitch",
+        theme: "Motivatie",
+        q: "Wat is een sterke eindpitch?",
+        answers: [
+          "Ik los storingen op en dat is alles.",
+          "Ik verbind maintenance met productieperformance: minder downtime, betere safety, hogere betrouwbaarheid en sterker teamownership.",
+          "Ik wil vooral doorgroeien.",
+          "Ik werk liever alleen."
+        ],
+        correct: 1,
+        model: "Mijn kracht is dat ik maintenance verbind met productieperformance. Ik focus op safety, quality, uptime, kosten en teamontwikkeling. Ik gebruik data, betrek productie en techniekers, en verbeter structureel.",
+        why: "Dit is kort, sterk en sluit perfect aan bij Kemin."
+      }
+    ];
+
+    function renderQuiz() {
+      const container = document.getElementById("quizContainer");
+      let html = "";
+      let currentSection = "";
+
+      questions.forEach((item, index) => {
+        if (item.section !== currentSection) {
+          currentSection = item.section;
+          html += `<h2 class="section-title">${currentSection}</h2>`;
+        }
+
+        html += `
+          <article class="question" id="question-${index}">
+            <span class="tag">${item.theme}</span>
+            <h3>${index + 1}. ${item.q}</h3>
+            <div class="answers">
+              ${item.answers.map((answer, answerIndex) => `
+                <label class="answer">
+                  <input type="radio" name="q${index}" value="${answerIndex}" onchange="updateProgress()" />
+                  ${String.fromCharCode(65 + answerIndex)}. ${answer}
+                </label>
+              `).join("")}
+            </div>
+            <div class="feedback" id="feedback-${index}"></div>
+            <div class="model-answer" id="model-${index}">
+              <strong>Modelantwoord:</strong><br>${item.model}<br><br>
+              <strong>Waarom sterk:</strong><br>${item.why}
+            </div>
+            <div class="answer-analysis" id="analysis-${index}"></div>
+          </article>
+        `;
+      });
+
+      container.innerHTML = html;
+      updateProgress();
+    }
+
+    function getSelected(index) {
+      const selected = document.querySelector(`input[name="q${index}"]:checked`);
+      return selected ? Number(selected.value) : null;
+    }
+
+    function updateProgress() {
+      let answered = 0;
+      questions.forEach((_, index) => {
+        if (getSelected(index) !== null) answered++;
+      });
+      document.getElementById("answeredCount").textContent = `Beantwoord: ${answered} / ${questions.length}`;
+      document.getElementById("progressBar").style.width = `${(answered / questions.length) * 100}%`;
+    }
+
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getHowExplanation(theme) {
+      const howMap = {
+        "Rolbegrip": "Gebruik dit in het interview om te tonen dat je de functie breder ziet dan storingen oplossen. Koppel je antwoord aan uptime, betrouwbaarheid, productiecontinuïteit, veiligheid en CMMS-discipline.",
+        "Teamleiding": "Gebruik dit om te tonen hoe je mensen aanstuurt: duidelijke verwachtingen, coaching, opleiding, ownership, veiligheid en consequente opvolging. Geef liefst een voorbeeld van een team dat je hebt geleid.",
+        "CMMS": "Gebruik dit om te tonen dat je onderhoud data-gedreven aanstuurt. Leg uit dat goede werkorderdata nodig is voor MTTR, MTBF, downtime-analyse, spare parts en budgetcontrole.",
+        "Downtime": "Gebruik dit om te tonen dat je niet alleen sneller wilt herstellen, maar vooral herhalingsstoringen wilt voorkomen. Start altijd met data, bepaal topverliezen en zet acties om in PM, RCA of spare parts verbetering.",
+        "RCA": "Gebruik dit om te tonen dat je structureel denkt. Zeg dat je eerst veilig herstelt, daarna de echte oorzaak zoekt met maintenance, productie en eventueel engineering, en acties opvolgt in CMMS.",
+        "Preventive Maintenance": "Gebruik dit om te tonen dat je preventief onderhoud niet blind uitvoert, maar risico-gebaseerd op kritische assets, historiek, kwaliteit, veiligheid en productie-impact.",
+        "Contractors": "Gebruik dit om te tonen dat externe partners onder dezelfde safety-, GMP- en kwaliteitsregels vallen als interne medewerkers. Noem scope, vergunningen, LOTO, planning, toezicht en oplevering.",
+        "Budget": "Gebruik dit om te tonen dat je kosten beheerst zonder safety of reliability te schaden. Besparen doe je door minder noodinterventies, minder herhalingsstoringen en betere planning.",
+        "Spare Parts": "Gebruik dit om te tonen dat je balans zoekt tussen beschikbaarheid en voorraadkost. Kritische onderdelen bepaal je op basis van risico, levertijd, impact en storingshistoriek.",
+        "Safety/GMP": "Gebruik dit om te tonen dat veiligheid en productkwaliteit altijd boven snelheid staan. In een GMP-omgeving moet onderhoud proper, traceerbaar, gecontroleerd en volgens SOP gebeuren.",
+        "Calibration": "Gebruik dit om te tonen dat maintenance ook productkwaliteit beschermt. Foutieve metingen kunnen leiden tot verkeerde dosering, batchafwijkingen en complianceproblemen.",
+        "5S/CI": "Gebruik dit om te tonen dat je onderhoudsorganisatie wil professionaliseren. 5S en continuous improvement zorgen voor minder zoekwerk, betere veiligheid, betere discipline en structurele verbeteringen.",
+        "Automatisering": "Gebruik dit om te tonen dat je moderne installaties begrijpt. Storingen kunnen mechanisch, elektrisch, PLC-, sensor-, drive- of software-gerelateerd zijn.",
+        "Onboarding": "Gebruik dit om te tonen dat je gestructureerd start: eerst luisteren en begrijpen, daarna data analyseren, daarna quick wins en structurele verbeteracties implementeren.",
+        "Motivatie": "Gebruik dit om je fit met Kemin helder te maken. Verbind je ervaring met reliability, safety, GMP, teamleiding, CMMS, productieperformance en ownership.",
+        "Samenwerking productie": "Gebruik dit om te tonen dat je productie niet als tegenpartij ziet. Production en maintenance hebben hetzelfde doel: veilig, kwalitatief en betrouwbaar produceren."
+      };
+      return howMap[theme] || "Gebruik dit antwoord door het te koppelen aan veiligheid, kwaliteit, uptime, CMMS-data en concrete voorbeelden uit je eigen maintenance-ervaring.";
+    }
+
+    function getWrongReason(answerText, theme) {
+      const text = answerText.toLowerCase();
+
+      if (text.includes("alleen") || text.includes("uitsluitend")) {
+        return "Dit is te beperkt. Een Maintenance Manager bij Kemin moet breder denken dan één taak: team, productie, safety, GMP, CMMS, kosten, projecten en betrouwbaarheid hangen samen.";
+      }
+      if (text.includes("negeren") || text.includes("niets")) {
+        return "Dit is zwak omdat het risico’s laat bestaan. In maintenance moet je afwijkingen zichtbaar maken, corrigeren en opvolgen, zeker bij safety, GMP, storingen en CMMS.";
+      }
+      if (text.includes("laagste prijs") || text.includes("goedkoopste")) {
+        return "Dit is te kortzichtig. Bij maintenance telt total cost of ownership: veiligheid, kwaliteit, levertijd, betrouwbaarheid, downtime-impact en compliance zijn minstens even belangrijk als prijs.";
+      }
+      if (text.includes("sneller") && text.includes("veilig")) {
+        return "Dit is gevaarlijk. Snelheid mag nooit boven veiligheid of kwaliteit komen. Bij Kemin zijn Safety, GMP, SOP’s en compliance expliciete verwachtingen.";
+      }
+      if (text.includes("productie altijd") || text.includes("volledig bij productie")) {
+        return "Dit maakt maintenance te passief. Productie is een partner, maar maintenance moet technische risico’s, safety en reliability professioneel bewaken.";
+      }
+      if (text.includes("stoppen met cmms") || text.includes("minder te registreren") || text.includes("niet registreren")) {
+        return "Dit ondermijnt data-driven maintenance. Zonder correcte registratie kun je storingen, kosten, spare parts, MTTR, MTBF en PM-effectiviteit niet verbeteren.";
+      }
+      if (text.includes("alle beslissingen zelf") || text.includes("niet delegeren")) {
+        return "Dit past niet bij sterk leiderschap. Een high-performing maintenance team heeft ownership, duidelijke rollen, coaching en vertrouwen nodig.";
+      }
+      if (text.includes("trial-and-error") || text.includes("leverancier bellen")) {
+        return "Dit kan soms helpen, maar is geen gestructureerde probleemoplossing. Bij terugkerende storingen verwacht men RCA, data-analyse en correctieve acties.";
+      }
+      if (theme === "Safety/GMP") {
+        return "Dit antwoord mist de kern: safety, GMP, traceerbaarheid, SOP-discipline en gecontroleerde vrijgave zijn essentieel in een gereguleerde productieomgeving.";
+      }
+      if (theme === "CMMS") {
+        return "Dit antwoord mist dat CMMS het centrale stuurinstrument is voor werkorders, storingshistoriek, PM, spare parts, kosten en KPI’s.";
+      }
+      if (theme === "RCA") {
+        return "Dit antwoord focust onvoldoende op de echte oorzaak. RCA moet herhaling voorkomen, niet alleen het symptoom oplossen.";
+      }
+      if (theme === "Preventive Maintenance") {
+        return "Dit antwoord mist het preventieve karakter: onderhoud moet gepland, risico-gebaseerd en afgestemd met productie zijn om ongeplande downtime te vermijden.";
+      }
+      if (theme === "Budget") {
+        return "Dit antwoord mist kostenbeheersing op managementniveau. Budgetcontrole gaat over prioriteiten, risico, betrouwbaarheid, purchase orders en structurele besparingen.";
+      }
+      return "Dit antwoord is minder sterk omdat het niet volledig aansluit bij de vacature. Kemin zoekt een Maintenance Manager die safety, uptime, CMMS, people leadership, compliance en continuous improvement combineert.";
+    }
+
+    function buildAnswerAnalysis(item, index) {
+      const letters = ["A", "B", "C", "D"];
+      let html = `<div class="analysis-title">Uitgebreide antwoordanalyse</div>`;
+
+      item.answers.forEach((answer, answerIndex) => {
+        const isCorrect = answerIndex === item.correct;
+        if (isCorrect) {
+          html += `
+            <div class="option-explain correct-option">
+              <strong>${letters[answerIndex]}. ${escapeHtml(answer)}</strong><br>
+              <strong>Waarom dit juist is:</strong> ${escapeHtml(item.why)}<br>
+              <strong>Hoe je dit concreet uitlegt:</strong> ${escapeHtml(item.model)}
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="option-explain wrong-option">
+              <strong>${letters[answerIndex]}. ${escapeHtml(answer)}</strong><br>
+              <strong>Waarom dit minder goed is:</strong> ${escapeHtml(getWrongReason(answer, item.theme))}
+            </div>
+          `;
+        }
+      });
+
+      html += `
+        <div class="how-box">
+          <strong>Hoe toepassen in jouw interview:</strong><br>
+          ${escapeHtml(getHowExplanation(item.theme))}
+        </div>
+      `;
+
+      return html;
+    }
+
+    function calculateScore() {
+      let score = 0;
+      const weakThemes = {};
+
+      questions.forEach((item, index) => {
+        const selected = getSelected(index);
+        const feedback = document.getElementById(`feedback-${index}`);
+        const model = document.getElementById(`model-${index}`);
+        const analysis = document.getElementById(`analysis-${index}`);
+
+        if (selected === item.correct) {
+          score++;
+          feedback.className = "feedback good";
+          feedback.innerHTML = `<strong>Correct.</strong> ${item.why}`;
+        } else {
+          weakThemes[item.theme] = (weakThemes[item.theme] || 0) + 1;
+          feedback.className = "feedback bad";
+          const correctLetter = String.fromCharCode(65 + item.correct);
+          if (selected === null) {
+            feedback.innerHTML = `<strong>Niet beantwoord.</strong> Correct antwoord is ${correctLetter}.`;
+          } else {
+            feedback.innerHTML = `<strong>Niet correct.</strong> Correct antwoord is ${correctLetter}.`;
+          }
+        }
+
+        model.classList.add("show");
+        analysis.innerHTML = buildAnswerAnalysis(item, index);
+        analysis.classList.add("show");
+      });
+
+      const percentage = Math.round((score / questions.length) * 100);
+      document.getElementById("liveScore").textContent = `Score: ${score} / ${questions.length} (${percentage}%)`;
+
+      const resultPanel = document.getElementById("resultPanel");
+      const scoreText = document.getElementById("scoreText");
+      const levelText = document.getElementById("levelText");
+      const adviceText = document.getElementById("adviceText");
+      const reviewList = document.getElementById("reviewList");
+
+      scoreText.textContent = `Je behaalde ${score} van de ${questions.length} punten. Dat is ${percentage}%.`;
+
+      levelText.className = "level";
+      if (percentage >= 90) {
+        levelText.textContent = "Niveau: zeer sterk voorbereid";
+        levelText.classList.add("excellent");
+        adviceText.textContent = "Je bent inhoudelijk klaar. Focus nu op het hardop oefenen van korte, overtuigende antwoorden met voorbeelden uit je eigen ervaring.";
+      } else if (percentage >= 75) {
+        levelText.textContent = "Niveau: goed voorbereid";
+        levelText.classList.add("good");
+        adviceText.textContent = "Je kent de meeste thema’s. Herhaal de zwakkere onderwerpen en oefen vooral situatievragen rond storingen, safety en productieconflict.";
+      } else if (percentage >= 60) {
+        levelText.textContent = "Niveau: basis is goed, maar aanscherpen nodig";
+        levelText.classList.add("medium");
+        adviceText.textContent = "Je begrijpt de kern, maar moet de begrippen concreter kunnen uitleggen. Leer de modelantwoorden en oefen met voorbeelden.";
+      } else {
+        levelText.textContent = "Niveau: eerst basis grondig herhalen";
+        levelText.classList.add("low");
+        adviceText.textContent = "Herhaal vooral CMMS, GMP, RCA, PM, MTTR/MTBF, safety, contractors en budgetcontrole voordat je het gesprek ingaat.";
+      }
+
+      reviewList.innerHTML = "";
+      const sortedWeakThemes = Object.entries(weakThemes).sort((a, b) => b[1] - a[1]);
+      if (sortedWeakThemes.length === 0) {
+        reviewList.innerHTML = "<li>Geen zwakke thema’s. Je had alles correct.</li>";
+      } else {
+        sortedWeakThemes.forEach(([theme, count]) => {
+          reviewList.innerHTML += `<li><strong>${theme}</strong>: ${count} fout of niet beantwoord.</li>`;
+        });
+      }
+
+      resultPanel.classList.add("show");
+      resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function showAllModelAnswers() {
+      questions.forEach((item, index) => {
+        document.getElementById(`model-${index}`).classList.add("show");
+        const analysis = document.getElementById(`analysis-${index}`);
+        analysis.innerHTML = buildAnswerAnalysis(item, index);
+        analysis.classList.add("show");
+      });
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll("input[type='radio']").forEach(input => input.checked = false);
+      document.querySelectorAll(".feedback").forEach(item => {
+        item.className = "feedback";
+        item.innerHTML = "";
+      });
+      document.querySelectorAll(".model-answer").forEach(item => item.classList.remove("show"));
+      document.querySelectorAll(".answer-analysis").forEach(item => {
+        item.classList.remove("show");
+        item.innerHTML = "";
+      });
+      document.getElementById("resultPanel").classList.remove("show");
+      document.getElementById("liveScore").textContent = "Score: nog niet berekend";
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>
