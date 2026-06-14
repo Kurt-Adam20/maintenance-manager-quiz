@@ -26,30 +26,38 @@
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
     header {
       background: linear-gradient(135deg, #0f766e, #134e4a);
       color: white;
-      padding: 36px 20px;
+      padding: clamp(24px, 7vw, 40px) 20px;
+      padding-top: max(clamp(24px, 7vw, 40px), env(safe-area-inset-top));
       text-align: center;
     }
 
     header h1 {
       margin: 0 0 10px;
-      font-size: 2rem;
+      font-size: clamp(1.45rem, 5vw, 2rem);
+      line-height: 1.2;
     }
 
     header p {
       margin: 0 auto;
       max-width: 900px;
-      font-size: 1rem;
+      font-size: clamp(0.92rem, 2.6vw, 1rem);
       opacity: 0.95;
     }
 
@@ -70,7 +78,7 @@
 
     .intro-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 14px;
       margin-top: 18px;
     }
@@ -99,12 +107,19 @@
     button {
       border: none;
       border-radius: 10px;
-      padding: 11px 16px;
+      padding: 12px 16px;
+      min-height: 44px;
       background: var(--primary);
       color: white;
       cursor: pointer;
       font-size: 0.95rem;
       font-weight: 700;
+      transition: background 0.15s ease, transform 0.05s ease;
+      touch-action: manipulation;
+    }
+
+    button:active {
+      transform: scale(0.98);
     }
 
     button:hover {
@@ -200,12 +215,17 @@
     }
 
     label.answer {
-      display: block;
-      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      min-height: 44px;
       border: 1px solid var(--border);
       border-radius: 10px;
       background: #fafafa;
       cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease;
+      touch-action: manipulation;
     }
 
     label.answer:hover {
@@ -213,8 +233,19 @@
       border-color: #5eead4;
     }
 
+    /* Duidelijke visuele selectie-state */
+    label.answer:has(input:checked) {
+      background: #ccfbf1;
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+
     label.answer input {
-      margin-right: 8px;
+      margin: 4px 0 0;
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      accent-color: var(--primary);
     }
 
     .feedback {
@@ -338,22 +369,84 @@
       padding: 24px;
     }
 
+    /* Knoppen-cluster in de controlbalk */
+    .controls > div:has(button) {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== Tablet en kleiner ===== */
     @media (max-width: 800px) {
-      .intro-grid {
-        grid-template-columns: 1fr;
+      main {
+        margin: 16px auto;
+        padding: 0 12px 40px;
       }
 
-      header h1 {
-        font-size: 1.55rem;
+      .panel {
+        padding: 18px;
+        border-radius: 14px;
       }
 
       .controls {
         align-items: stretch;
+        gap: 14px;
       }
 
-      button {
-        width: 100%;
+      .score-box {
+        justify-content: space-between;
       }
+
+      .score-pill {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+
+      .controls > div:has(button) {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      /* Primaire actie volle breedte bovenaan */
+      .controls > div:has(button) button:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    /* ===== Telefoon ===== */
+    @media (max-width: 480px) {
+      .panel {
+        padding: 15px;
+      }
+
+      .question {
+        padding: 15px;
+        margin: 12px 0;
+      }
+
+      .question h3 {
+        font-size: 1rem;
+      }
+
+      .controls > div:has(button) {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        font-size: 1.15rem;
+        margin: 22px 0 10px;
+      }
+
+      .feedback, .model-answer, .answer-analysis, .how-box, .option-explain {
+        padding: 11px;
+      }
+    }
+
+    /* Respecteer reduced-motion voorkeur */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
     }
 
     @media print {
